@@ -1,0 +1,12 @@
+[Unit]
+Description=Sync aws route53 dns with ISP ip address
+After=network.target
+
+[Service]
+Type=simple
+User=nobody
+EnvironmentFile=/etc/default/aws-dyndns
+ExecStart=/usr/local/bin/aws-dyndns sync $AWS_DYNDNS_OPTS
+
+[Install]
+WantedBy=multi-user.target
