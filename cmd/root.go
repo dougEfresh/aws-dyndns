@@ -86,9 +86,7 @@ func initConfig() {
   viper.AutomaticEnv() // read in environment variables that match
 
   // If a config file is found, read it in.
-  if err := viper.ReadInConfig(); err == nil {
-    logger.Info(fmt.Sprintf("Using config file: %s", viper.ConfigFileUsed()))
-  }
+  _ = viper.ReadInConfig()
   if config.verbose {
     logger, _ = zap.NewDevelopment()
   }
