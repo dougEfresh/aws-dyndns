@@ -15,6 +15,9 @@
 package cmd
 
 import (
+	"fmt"
+
+	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/route53"
 )
@@ -28,4 +31,17 @@ func setupAws() error  {
 	}
 	r53 = route53.New(sess)
 	return nil
+}
+
+
+func getZoneId(domain string) (*route53.HostedZone, error) {
+	query := &route53.ListHostedZonesByNameInput{
+		DNSName: aws.String(config.domain),
+	}
+	zone, err := r53.ListHostedZonesByName(query)
+	if err != nil {
+		return nil, err
+	}
+	logger.Debug(fmt.Sprintf("Got back %p %s %s", zone.HostedZoneId, *zone.HostedZones[0].Id, *zone.HostedZones[0].Name))
+	return zone.HostedZones[0] , nil
 }

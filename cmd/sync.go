@@ -67,19 +67,16 @@ func sync() {
 		return
 	}
 	logger.Info(fmt.Sprintf("MyIp(%s)!=AwsIp(%s)", myIp.IP, awsIp.IP))
-	query := &route53.ListHostedZonesByNameInput{
-		DNSName: aws.String(config.domain),
-	}
-	zone, err := r53.ListHostedZonesByName(query)
+	zoneId, err := getZoneId(config.domain)
 	if err != nil {
 		panic(err)
 	}
-	logger.Info(fmt.Sprintf("HostedZoneId:%s", zone.HostedZones[0].Id))
+	logger.Info(fmt.Sprintf("HostedZoneId:%s", zoneId.Id))
 	input := &route53.ChangeResourceRecordSetsInput{
 		ChangeBatch: &route53.ChangeBatch{
 			Changes: []*route53.Change{
 				{
-					Action: aws.String("UPSERT"),
+					Action: aws.String(route53.ChangeActionUpsert),
 					ResourceRecordSet: &route53.ResourceRecordSet{
 						Name: aws.String(fmt.Sprintf("%s.%s", config.record, config.domain)),
 						ResourceRecords: []*route53.ResourceRecord{
@@ -94,7 +91,7 @@ func sync() {
 			},
 			Comment: aws.String(fmt.Sprintf("previous %s ", awsIp.IP)),
 		},
-		HostedZoneId: zone.HostedZones[0].Id,
+		HostedZoneId: zoneId.Id,
 	}
 
 	_, err = r53.ChangeResourceRecordSets(input)

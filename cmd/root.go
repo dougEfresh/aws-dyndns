@@ -21,7 +21,6 @@ import (
 
   "github.com/spf13/cobra"
   "go.uber.org/zap"
-
   "github.com/mitchellh/go-homedir"
   "github.com/spf13/viper"
 )
@@ -60,7 +59,7 @@ func Execute() {
 func init() {
   cobra.OnInitialize(initConfig)
   rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.aws-dyndns.yaml)")
-  rootCmd.PersistentFlags().StringVar(&config.domain, "domain", "", "domain")
+  rootCmd.PersistentFlags().StringVarP(&config.domain, "domain", "d", "", "domain")
   rootCmd.PersistentFlags().StringVar(&config.profile, "profile", "aws-dyndns", "set aws profile or use AWS_PROFILE environment variable ")
   rootCmd.PersistentFlags().BoolVar(&config.verbose, "verbose", false, "verbose")
   os.Setenv("AWS_SDK_LOAD_CONFIG", "true")
@@ -88,7 +87,7 @@ func initConfig() {
 
   // If a config file is found, read it in.
   if err := viper.ReadInConfig(); err == nil {
-    logger.Info(fmt.Sprintf("Using config file:", viper.ConfigFileUsed()))
+    logger.Info(fmt.Sprintf("Using config file: %s", viper.ConfigFileUsed()))
   }
   if config.verbose {
     logger, _ = zap.NewDevelopment()
@@ -97,8 +96,13 @@ func initConfig() {
   if p == "" {
     os.Setenv("AWS_PROFILE", config.profile)
   }
-
   logger.Debug(fmt.Sprintf("Profile set to %s", os.Getenv("AWS_PROFILE")))
+	if config.domain == "" {
+		config.domain = viper.GetString("domain")
+	}
+	if config.profile == "" {
+		config.profile = viper.GetString("profile")
+	}
   err := setupAws()
   if err != nil {
     panic(err)
