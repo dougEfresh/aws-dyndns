@@ -3,11 +3,10 @@ module github.com/dougEfresh/aws-dyndns
 go 1.13
 
 require (
-	github.com/aws/aws-lambda-go v1.13.2
 	github.com/aws/aws-sdk-go v1.24.6
-	github.com/dougEfresh/lambdazap v0.0.0-20180327213147-ad7d89679c77
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/viper v1.4.0
+	github.com/stretchr/testify v1.4.0 // indirect
 	go.uber.org/zap v1.10.0
 )

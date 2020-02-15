@@ -1,6 +1,5 @@
 BIN_DIR := .tools/bin
 
-
 GO := go
 ifdef GO_BIN
 	GO = $(GO_BIN)
@@ -8,15 +7,12 @@ endif
 
 GOLANGCI_LINT_VERSION := 1.21.0
 GOLANGCI_LINT := $(BIN_DIR)/golangci-lint
-
-
 GIT_COMMIT := $(shell git rev-parse --short HEAD 2> /dev/null || echo "no-revision")
 GIT_COMMIT_MESSAGE := $(shell git show -s --format='%s' 2> /dev/null | tr ' ' _ | tr -d "'")
 GIT_TAG := $(shell git describe --tags 2> /dev/null || echo "no-tag")
 GIT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD 2> /dev/null || echo "no-branch")
 BUILD_TIME := $(shell date +%FT%T%z)
 GOFILES := $(shell find . -name '*.go' -type f)
-VERSION_PACKAGE := gitlab.appsflyer.com/infra-tools/af-go-dimager/pkg/version
 
 ## all: The default target. Build, test, lint
 all: test lint
@@ -42,8 +38,7 @@ test:
 
 ## test-coverate: Run all tests and collect coverage
 test-coverage:
-	$(GO) test ./... -race -coverprofile=.testCoverage.txt && $(GO) tool cover -html=.testCoverage.txt
-
+	$(GO) test -race ./... -v -covermode=count -coverprofile=testCoverage.txt
 
 ## lint: lint all go code
 lint: $(GOLANGCI_LINT)
