@@ -1,0 +1,18 @@
+image: golang:1
+
+test:
+  script:
+    - make test
+
+lint:
+  script:
+    - make lint
+
+build:
+  script:
+    - make aws-dyndns
+
+stages:
+  - test
+  - lint
+  - build
