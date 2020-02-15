@@ -71,7 +71,7 @@ func sync() {
 	if err != nil {
 		panic(err)
 	}
-	logger.Info(fmt.Sprintf("HostedZoneId:%s", zoneId.Id))
+	logger.Info(fmt.Sprintf("HostedZoneId:%s", *zoneId.Id))
 	input := &route53.ChangeResourceRecordSetsInput{
 		ChangeBatch: &route53.ChangeBatch{
 			Changes: []*route53.Change{

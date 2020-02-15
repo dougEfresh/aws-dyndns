@@ -16,7 +16,6 @@ GIT_TAG := $(shell git describe --tags 2> /dev/null || echo "no-tag")
 GIT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD 2> /dev/null || echo "no-branch")
 BUILD_TIME := $(shell date +%FT%T%z)
 VERSION_PACKAGE := gitlab.appsflyer.com/infra-tools/af-go-dimager/pkg/version
-DESTDIR := 
 
 ## all: The default target. Build, test, lint
 all: test lint
@@ -34,7 +33,7 @@ build:
 	$(GO) build -o aws-dyndns -v -ldflags '-X $(VERSION_PACKAGE).GitHash=$(GIT_COMMIT) -X $(VERSION_PACKAGE).GitTag=$(GIT_TAG) -X $(VERSION_PACKAGE).GitBranch=$(GIT_BRANCH) -X $(VERSION_PACKAGE).BuildTime=$(BUILD_TIME) -X $(VERSION_PACKAGE).GitCommitMessage=$(GIT_COMMIT_MESSAGE)' main.go
 
 install: test build
-	install -m755 aws-dyndns -t $(DESDIR)/usr/bin/
+	install -m755 -D aws-dyndns /usr/bin/aws-dyndns
 
 ## test: Run all tests
 test: build
