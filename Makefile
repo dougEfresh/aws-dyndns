@@ -15,6 +15,7 @@ GIT_COMMIT_MESSAGE := $(shell git show -s --format='%s' 2> /dev/null | tr ' ' _ 
 GIT_TAG := $(shell git describe --tags 2> /dev/null || echo "no-tag")
 GIT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD 2> /dev/null || echo "no-branch")
 BUILD_TIME := $(shell date +%FT%T%z)
+GOFILES := $(shell find . -name '*.go' -type f)
 VERSION_PACKAGE := gitlab.appsflyer.com/infra-tools/af-go-dimager/pkg/version
 
 ## all: The default target. Build, test, lint
@@ -29,14 +30,14 @@ fmt:
 	gofmt -s -w .
 
 ## build: build all files, including protoc if included
-build:
-	$(GO) build -o aws-dyndns -v -ldflags '-X $(VERSION_PACKAGE).GitHash=$(GIT_COMMIT) -X $(VERSION_PACKAGE).GitTag=$(GIT_TAG) -X $(VERSION_PACKAGE).GitBranch=$(GIT_BRANCH) -X $(VERSION_PACKAGE).BuildTime=$(BUILD_TIME) -X $(VERSION_PACKAGE).GitCommitMessage=$(GIT_COMMIT_MESSAGE)' main.go
+build: test
+	go build ./...
 
-install: test build
-	install -m755 -D aws-dyndns /usr/bin/aws-dyndns
+install: aws-dyndns
+	 install -m755 -D aws-dyndns $(DESTDIR)/usr/bin/aws-dyndns
 
 ## test: Run all tests
-test: build
+test:
 	$(GO) test -cover -race -v ./...
 
 ## test-coverate: Run all tests and collect coverage
@@ -51,3 +52,5 @@ lint: $(GOLANGCI_LINT)
 $(GOLANGCI_LINT):
 	curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(BIN_DIR) v$(GOLANGCI_LINT_VERSION)
 
+aws-dyndns: $(GOFILES)
+		$(GO) build -o aws-dyndns -v -ldflags '-X $(VERSION_PACKAGE).GitHash=$(GIT_COMMIT) -X $(VERSION_PACKAGE).GitTag=$(GIT_TAG) -X $(VERSION_PACKAGE).GitBranch=$(GIT_BRANCH) -X $(VERSION_PACKAGE).BuildTime=$(BUILD_TIME) -X $(VERSION_PACKAGE).GitCommitMessage=$(GIT_COMMIT_MESSAGE)' main.go
