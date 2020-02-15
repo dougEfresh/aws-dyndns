@@ -30,7 +30,7 @@ import (
 var syncCmd = &cobra.Command{
 	Use:   "sync",
 	Short: "A brief description of your command",
-	Long: "",
+	Long:  "",
 	Run: func(cmd *cobra.Command, args []string) {
 		sync()
 	},
@@ -101,13 +101,12 @@ func sync() {
 	logger.Info("Updated aws zone with new address")
 }
 
-
 func buildResolver(resolver string) net.Resolver {
 	logger.Debug(fmt.Sprintf("Using %s for resolver", resolver))
 	return net.Resolver{
 		PreferGo:     true,
 		StrictErrors: false,
-		Dial: builDialer(resolver),
+		Dial:         builDialer(resolver),
 	}
 }
 

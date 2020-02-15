@@ -26,9 +26,9 @@ import (
 var listRecordsCmd = &cobra.Command{
 	Use:   "listRecords",
 	Short: "list records of domain",
-	Long: "",
+	Long:  "",
 	Run: func(cmd *cobra.Command, args []string) {
-		zone , err := getZoneId(config.domain)
+		zone, err := getZoneId(config.domain)
 		if err != nil {
 			panic(err)
 		}

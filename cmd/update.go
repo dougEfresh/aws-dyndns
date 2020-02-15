@@ -29,13 +29,13 @@ import (
 var updateCmd = &cobra.Command{
 	Use:   "update",
 	Short: "upsert",
-	Long: "",
+	Long:  "",
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
 			panic(fmt.Errorf("Need to pass arg value"))
 		}
 		var recordValue = args[0]
-		zone , err := getZoneId(config.domain)
+		zone, err := getZoneId(config.domain)
 		if err != nil {
 			panic(err)
 		}

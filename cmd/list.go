@@ -25,13 +25,13 @@ import (
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "domains",
-	Long: "List available domains",
+	Long:  "List available domains",
 	Run: func(cmd *cobra.Command, args []string) {
 		zones, err := r53.ListHostedZones(nil)
 		if err != nil {
 			panic(err)
 		}
-		for _,z := range zones.HostedZones {
+		for _, z := range zones.HostedZones {
 			fmt.Printf("%s\t%s\t%d\n", *z.Name, *z.Id, *z.ResourceRecordSetCount)
 		}
 	},

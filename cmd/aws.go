@@ -24,7 +24,7 @@ import (
 
 var r53 *route53.Route53
 
-func setupAws() error  {
+func setupAws() error {
 	sess, err := session.NewSessionWithOptions(session.Options{})
 	if err != nil {
 		return err
@@ -32,7 +32,6 @@ func setupAws() error  {
 	r53 = route53.New(sess)
 	return nil
 }
-
 
 func getZoneId(domain string) (*route53.HostedZone, error) {
 	query := &route53.ListHostedZonesByNameInput{
@@ -43,5 +42,5 @@ func getZoneId(domain string) (*route53.HostedZone, error) {
 		return nil, err
 	}
 	logger.Debug(fmt.Sprintf("Got back %p %s %s", zone.HostedZoneId, *zone.HostedZones[0].Id, *zone.HostedZones[0].Name))
-	return zone.HostedZones[0] , nil
+	return zone.HostedZones[0], nil
 }

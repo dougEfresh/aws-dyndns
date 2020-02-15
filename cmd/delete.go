@@ -28,20 +28,20 @@ import (
 var deleteCmd = &cobra.Command{
 	Use:   "delete",
 	Short: "delete a  record",
-	Long: "",
+	Long:  "",
 	Run: func(cmd *cobra.Command, args []string) {
-		zone , err := getZoneId(config.domain)
+		zone, err := getZoneId(config.domain)
 		if err != nil {
 			panic(err)
 		}
 		query := route53.ListResourceRecordSetsInput{
-			HostedZoneId: zone.Id,
+			HostedZoneId:    zone.Id,
 			StartRecordName: aws.String(fmt.Sprintf("%s.%s", config.record, config.domain)),
 		}
 		records, err := r53.ListResourceRecordSets(&query)
-		 if err != nil {
-		 	panic(err)
-		 }
+		if err != nil {
+			panic(err)
+		}
 		if len(records.ResourceRecordSets) == 0 {
 			panic(fmt.Errorf("no records for %s.%s", config.record, config.domain))
 		}
@@ -52,7 +52,7 @@ var deleteCmd = &cobra.Command{
 		for _, r := range resourceRecords {
 			changeSet = append(changeSet, &route53.ResourceRecordSet{
 				Name: r.Name,
-				TTL: r.TTL,
+				TTL:  r.TTL,
 			})
 		}
 
@@ -60,7 +60,7 @@ var deleteCmd = &cobra.Command{
 			ChangeBatch: &route53.ChangeBatch{
 				Changes: []*route53.Change{
 					{
-						Action: aws.String(route53.ChangeActionDelete),
+						Action:            aws.String(route53.ChangeActionDelete),
 						ResourceRecordSet: resourceRecords[0],
 					},
 				},
