@@ -53,10 +53,10 @@ func sync() {
 	}
 	awsDns := buildResolver(awsNsIpaddrs[0].IP.String())
 	names, err := awsDns.LookupIPAddr(context.Background(), fmt.Sprintf("%s.%s", config.record, config.domain))
-	if err != nil {
-		panic(err)
+	var awsIp net.IPAddr
+	if err == nil {
+		awsIp = names[0]
 	}
-	awsIp := names[0]
 	names, err = openDns.LookupIPAddr(context.Background(), "myip.opendns.com")
 	if err != nil {
 		panic(err)
