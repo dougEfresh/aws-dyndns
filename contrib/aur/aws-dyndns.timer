@@ -1,0 +1,10 @@
+[Unit]
+Description=Sync aws dns with ISP address
+
+[Timer]
+OnBootSec=10min
+OnUnitActiveSec=10min
+Unit=aws-dyndns.service
+
+[Install]
+WantedBy=timers.target
