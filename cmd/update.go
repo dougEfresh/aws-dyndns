@@ -17,6 +17,7 @@ package cmd
 
 import (
 	"fmt"
+	"net"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -30,11 +31,15 @@ var updateCmd = &cobra.Command{
 	Use:   "update",
 	Short: "upsert",
 	Long:  "",
+	Args:  cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) == 0 {
-			panic(fmt.Errorf("Need to pass arg value"))
-		}
 		var recordValue = args[0]
+		ip := net.ParseIP(recordValue)
+		addressType := route53.RRTypeA
+		if ip.To16() != nil {
+			addressType = route53.RRTypeAaaa
+		}
+
 		zone, err := getZoneId(config.domain)
 		if err != nil {
 			panic(err)
@@ -52,7 +57,7 @@ var updateCmd = &cobra.Command{
 								},
 							},
 							TTL:  aws.Int64(600),
-							Type: aws.String(route53.RRTypeA),
+							Type: aws.String(addressType),
 						},
 					},
 				},

@@ -29,7 +29,7 @@ import (
 // syncCmd represents the sync command
 var syncCmd = &cobra.Command{
 	Use:   "sync",
-	Short: "A brief description of your command",
+	Short: "sync your host ip with ",
 	Long:  "",
 	Run: func(cmd *cobra.Command, args []string) {
 		sync()
@@ -61,7 +61,13 @@ func sync() {
 	if err != nil {
 		panic(err)
 	}
+
+	for _, n := range names {
+		n.IP.To16()
+		n.IP.IsGlobalUnicast()
+	}
 	myIp := names[0]
+
 	if myIp.IP.Equal(awsIp.IP) {
 		logger.Info(fmt.Sprintf("Same IP as aws %s", myIp.IP))
 		return
@@ -85,7 +91,7 @@ func sync() {
 							},
 						},
 						TTL:  aws.Int64(600),
-						Type: aws.String("A"),
+						Type: aws.String("AAAA"),
 					},
 				},
 			},
@@ -115,7 +121,7 @@ func builDialer(resolver string) func(ctx context.Context, network, address stri
 		d := net.Dialer{
 			Timeout: time.Millisecond * time.Duration(1000),
 		}
-		r := fmt.Sprintf("%s:53", resolver)
+		r := fmt.Sprintf("[%s]:53", resolver)
 		logger.Debug(fmt.Sprintf("Calling %s", r))
 		return d.DialContext(ctx, "udp", r)
 	}
