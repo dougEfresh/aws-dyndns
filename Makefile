@@ -1,51 +1,62 @@
-BIN_DIR := .tools/bin
+projectname?=aws-dyndns
+VERSION ?= $(shell git rev-parse --short HEAD)
+#shell git describe --abbrev=0 --tags)
+default: help
 
-GO := go
-ifdef GO_BIN
-	GO = $(GO_BIN)
-endif
+.PHONY: help
+help: ## list makefile targets
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-GOLANGCI_LINT_VERSION := 1.21.0
-GOLANGCI_LINT := $(BIN_DIR)/golangci-lint
-GIT_COMMIT := $(shell git rev-parse --short HEAD 2> /dev/null || echo "no-revision")
-GIT_COMMIT_MESSAGE := $(shell git show -s --format='%s' 2> /dev/null | tr ' ' _ | tr -d "'")
-GIT_TAG := $(shell git describe --tags 2> /dev/null || echo "no-tag")
-GIT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD 2> /dev/null || echo "no-branch")
-BUILD_TIME := $(shell date +%FT%T%z)
-GOFILES := $(shell find . -name '*.go' -type f)
+.PHONY: build
+build: ## build golang binary
+	go build -ldflags "-X cmd/version.version=$(VERSION)" -o $(projectname) ./main.go
 
-## all: The default target. Build, test, lint
-all: test lint
+.PHONY: install
+install: ## install golang binary
+	@go install -ldflags "-X cmd/version.version=$(VERSION)"
 
-## tidy: go mod tidy
-tidy:
-	$(GO) mod tidy -v
+.PHONY: run
+run: ## run the app
+	@go run -ldflags "-X cmd/version.version=$(VERSION)"  main.go
 
-## fmt: format all go code
-fmt:
-	gofmt -s -w .
+.PHONY: fmtcheck
+fmtcheck: ## run gofmt and print detected files
+	@sh -c "'$(CURDIR)/scripts/gofmtcheck.sh'"
 
-## build: build all files, including protoc if included
-build: test
-	go build ./...
+PHONY: test
+test: ## run go tests
+	go test -race -v ./...
 
-install: aws-dyndns
-	 install -m755 -D aws-dyndns $(DESTDIR)/usr/bin/aws-dyndns
+PHONY: clean
+clean: ## clean up environment
+	@rm -rf coverage.out dist/ $(projectname)
 
-## test: Run all tests
-test:
-	$(GO) test -cover -race -v ./...
+PHONY: cover
+cover: ## display test coverage
+	go test -v -race $(shell go list ./... | grep -v /vendor/) -v -coverprofile=coverage.out
+	go tool cover -func=coverage.out
 
-## test-coverate: Run all tests and collect coverage
-test-coverage:
-	$(GO) test -race ./... -v -covermode=count -coverprofile=testCoverage.txt
+PHONY: fmt
+fmt: ## format go files
+	go fmt ./...
 
-## lint: lint all go code
-lint: $(GOLANGCI_LINT)
-	$(GOLANGCI_LINT) run --fast --enable-all -D wsl
+PHONY: lint
+lint: ## lint go files
+	golangci-lint run -c .golang-ci.yml
 
-$(GOLANGCI_LINT):
-	curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(BIN_DIR) v$(GOLANGCI_LINT_VERSION)
+PHONY: lint-fix
+lint-fix: ## fix
+	golangci-lint run -c .golang-ci.yml --fix
 
-aws-dyndns: $(GOFILES)
-		$(GO) build -o aws-dyndns -v -ldflags '-X $(VERSION_PACKAGE).GitHash=$(GIT_COMMIT) -X $(VERSION_PACKAGE).GitTag=$(GIT_TAG) -X $(VERSION_PACKAGE).GitBranch=$(GIT_BRANCH) -X $(VERSION_PACKAGE).BuildTime=$(BUILD_TIME) -X $(VERSION_PACKAGE).GitCommitMessage=$(GIT_COMMIT_MESSAGE)' main.go
+.PHONY: docker-build
+docker-build: ## dockerize golang application
+	@docker build --tag $(projectname) .
+
+.PHONY: docker-run
+docker-run:
+	@docker run $(projectname)
+
+.PHONY: pre-commit
+pre-commit:	## run pre-commit hooks
+	pre-commit run
+

@@ -1,0 +1,53 @@
+env:
+  - GO111MODULE=on
+  - CGO_ENABLED=0
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  -
+    binary: aws-dyndns
+    ldflags: -s -w -X main.version={{ .Version }}
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+
+archives:
+  -
+    builds:
+      - aws-dyndns
+    format_overrides:
+      - goos: windows
+        format: zip
+    replacements:
+      darwin: Darwin
+      linux: Linux
+      amd64: x86_64
+
+nfpms:
+  -
+    vendor: aws-dyndns
+    homepage: https://github.com/dougEfresh/aws-dyndns
+    maintainer: "Douglas Chimento <dchimento@gmail.com>"
+    description: ""
+    license: APACHE
+    formats:
+      - apk
+      - deb
+      - rpm
+    bindir: /usr/bin
+
+checksum:
+  name_template: "checksums.txt"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^assets:"
+      - "^scripts:"

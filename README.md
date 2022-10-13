@@ -1,2 +1,4 @@
-WIP
 # aws-dyndns
+ **TBD**
+
+[![Test](https://github.com/dougEfresh/aws-dyndns/actions/workflows/test.yml/badge.svg)](https://github.com/dougEfresh/aws-dyndns/actions/workflows/test.yml) [![golangci-lint](https://github.com/dougEfresh/aws-dyndns/actions/workflows/lint.yml/badge.svg)](https://github.com/dougEfresh/aws-dyndns/actions/workflows/lint.yml) [![Go Report Card](https://goreportcard.com/badge/github.com/dougEfresh/aws-dyndns)](https://goreportcard.com/report/github.com/dougEfresh/aws-dyndns) [![Go Reference](https://pkg.go.dev/badge/github.com/dougEfresh/aws-dyndns.svg)](https://pkg.go.dev/github.com/dougEfresh/aws-dyndns) [![codecov](https://codecov.io/gh/dougEfresh/aws-dyndns/branch/main/graph/badge.svg?token=Y5K4SID71F)](https://codecov.io/gh/dougEfresh/aws-dyndns)
